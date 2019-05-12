@@ -1,8 +1,0 @@
-{
-    "git.ignoreLimitWarning": true,
-    
-    "python.linting.pylintArgs": [
-        "----extension-pkg-whitelist=pygame"
-        ],
-        "editor.wordWrap": "wordWrapColumn"
-}
