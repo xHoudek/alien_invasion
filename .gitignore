@@ -1,3 +1,3 @@
-# ignore these files and folders
-.vscode
-__pycache__
+# ignore these folders
+.vscode/
+__pycache__/
