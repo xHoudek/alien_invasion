@@ -17,7 +17,7 @@ class Settings():
 
         # bullet settings
         self.bullet_speed_factor = 6
-        self.bullet_width = 300
+        self.bullet_width = 3
             # normal: 3
             # superwide: 300
         self.bullet_height = 15
