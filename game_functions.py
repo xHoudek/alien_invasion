@@ -45,9 +45,11 @@ def check_play_button(ai_settings, screen, stats, play_button, ship, aliens,
     """start a new game when the player clicks Play"""
     button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
     if button_clicked and not stats.game_active:
+        # reset the game settings
+        ai_settings.initialize_dynamic_settings()
         start_game(ai_settings, screen, stats, play_button, ship, aliens, bullets)
                 
-def update_screen(ai_settings, screen, stats, ship, aliens, bullets, play_button):
+def update_screen(ai_settings, screen, stats, sb, ship, aliens, bullets, play_button):
     """update images on the screen and flip to the new screen"""
     # redraw the screen during each pass through the loop
     screen.fill(ai_settings.bg_color)
@@ -57,6 +59,9 @@ def update_screen(ai_settings, screen, stats, ship, aliens, bullets, play_button
         bullet.draw_bullet()
     ship.blitme()
     aliens.draw(screen)
+
+    # draw the score information
+    sb.show_score()
 
     # draw the play button if the game is inactive
     if not stats.game_active:
@@ -87,7 +92,7 @@ def check_keyup_events(event, ship):
     elif event.key == pygame.K_a:
         ship.moving_left = False
 
-def update_bullets(ai_settings, screen, ship, aliens, bullets):
+def update_bullets(ai_settings, screen, stats, sb, ship, aliens, bullets):
     """update position of bullets and get rid of old bullets"""
     # update bullet positions
     bullets.update()
@@ -97,16 +102,22 @@ def update_bullets(ai_settings, screen, ship, aliens, bullets):
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
 
-    check_bullet_alien_collision(ai_settings, screen, ship, aliens, bullets)
+    check_bullet_alien_collision(ai_settings, screen, stats, sb, ship, aliens, bullets)
 
-def check_bullet_alien_collision(ai_settings, screen, ship, aliens, bullets):
+def check_bullet_alien_collision(ai_settings, screen, stats, sb, ship, aliens, bullets):
     """respond to bullet-alien collisions"""
     # remove any bullets and aliens that have collided
     collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
 
+    if collisions:
+        for aliens in collisions.values():
+            stats.score += ai_settings.alien_points * len(aliens)
+            sb.prep_score()
+
     if len(aliens) == 0:
-        # destroy existing bullets and create new fleet
+        # destroy existing bullets, speed up game, and create new fleet
         bullets.empty()
+        ai_settings.increase_speed()
         create_fleet(ai_settings, screen,ship, aliens)
 
 def fire_bullet(ai_settings, screen, ship, bullets):
